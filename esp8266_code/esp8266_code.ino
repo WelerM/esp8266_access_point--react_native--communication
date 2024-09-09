@@ -36,7 +36,9 @@ void setup() {
 
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
+
   Serial.println(IP);
+
 
   // Set up WebSocket server
   webSocket.begin();
@@ -64,6 +66,9 @@ void setup() {
 
 void loop() {
   webSocket.loop();
+
+
+
 }
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
