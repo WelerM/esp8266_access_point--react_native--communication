@@ -1,3 +1,6 @@
+//This code creates an access point wi-fi that enables communication with mobile devices like a smarphone for exemple.
+//The mobile device will connect to the ESP8266 network and control it through react native
+
 #include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
 
@@ -19,7 +22,7 @@ const int MOTOR2_IN4 = 2;  // GPIO2 (D4) - Motor 2
 // Define PWM parameters
 const int PWM_FREQ = 1000;  // PWM frequency (1 kHz)
 const int PWM_RESOLUTION = 8;  // PWM resolution (8-bit, 0-255)
-const int MOTOR_SPEED = 51;  // Speed reduction to 20% of 255 (255 * 0.20 = 51)
+const int MOTOR_SPEED = 90;  // Less than this can potentially make the cart unable to move
 
 // Initialize PWM pins
 const int MOTOR1_PWM = MOTOR1_IN1;
@@ -90,27 +93,29 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t* payload, size_t length)
   }
 }
 
-// Functions to control motors
+// Functions to control motors with speed control
 void moveForward() {
   Serial.println("Moving Forward");
 
   blinkLed();
 
-  digitalWrite(MOTOR1_IN1, HIGH);
-  digitalWrite(MOTOR1_IN2, LOW);
-  digitalWrite(MOTOR2_IN3, HIGH);
-  digitalWrite(MOTOR2_IN4, LOW);
+  // Set the speed using PWM
+  analogWrite(MOTOR1_IN1, MOTOR_SPEED);  // Motor 1 forward
+  analogWrite(MOTOR1_IN2, LOW);          // Motor 1 backward (off)
+  analogWrite(MOTOR2_IN3, MOTOR_SPEED);  // Motor 2 forward
+  analogWrite(MOTOR2_IN4, LOW);          // Motor 2 backward (off)
 }
 
 void moveBackward() {
   Serial.println("Moving Backward");
-  
+
   blinkLed();
 
-  digitalWrite(MOTOR1_IN1, LOW);
-  digitalWrite(MOTOR1_IN2, HIGH);
-  digitalWrite(MOTOR2_IN3, LOW);
-  digitalWrite(MOTOR2_IN4, HIGH);
+  // Set the speed using PWM
+  analogWrite(MOTOR1_IN1, LOW);          // Motor 1 forward (off)
+  analogWrite(MOTOR1_IN2, MOTOR_SPEED);  // Motor 1 backward
+  analogWrite(MOTOR2_IN3, LOW);          // Motor 2 forward (off)
+  analogWrite(MOTOR2_IN4, MOTOR_SPEED);  // Motor 2 backward
 }
 
 void turnLeft() {
@@ -118,10 +123,11 @@ void turnLeft() {
 
   blinkLed();
 
-  digitalWrite(MOTOR1_IN1, HIGH);
-  digitalWrite(MOTOR1_IN2, LOW);
-  digitalWrite(MOTOR2_IN3, LOW);
-  digitalWrite(MOTOR2_IN4, HIGH);
+  // Set the speed for turning
+  analogWrite(MOTOR1_IN1, MOTOR_SPEED);  // Motor 1 forward
+  analogWrite(MOTOR1_IN2, LOW);          // Motor 1 backward (off)
+  analogWrite(MOTOR2_IN3, LOW);          // Motor 2 forward (off)
+  analogWrite(MOTOR2_IN4, MOTOR_SPEED);  // Motor 2 backward
 }
 
 void turnRight() {
@@ -129,10 +135,11 @@ void turnRight() {
 
   blinkLed();
 
-  digitalWrite(MOTOR1_IN1, LOW);
-  digitalWrite(MOTOR1_IN2, HIGH);
-  digitalWrite(MOTOR2_IN3, HIGH);
-  digitalWrite(MOTOR2_IN4, LOW);
+  // Set the speed for turning
+  analogWrite(MOTOR1_IN1, LOW);          // Motor 1 forward (off)
+  analogWrite(MOTOR1_IN2, MOTOR_SPEED);  // Motor 1 backward
+  analogWrite(MOTOR2_IN3, MOTOR_SPEED);  // Motor 2 forward
+  analogWrite(MOTOR2_IN4, LOW);          // Motor 2 backward (off)
 }
 
 void stopMotors() {
@@ -140,10 +147,11 @@ void stopMotors() {
 
   digitalWrite(LED_PIN, HIGH);  // Turn off LED
 
-  digitalWrite(MOTOR1_IN1, LOW);
-  digitalWrite(MOTOR1_IN2, LOW);
-  digitalWrite(MOTOR2_IN3, LOW);
-  digitalWrite(MOTOR2_IN4, LOW);
+  // Stop all motors
+  analogWrite(MOTOR1_IN1, LOW);
+  analogWrite(MOTOR1_IN2, LOW);
+  analogWrite(MOTOR2_IN3, LOW);
+  analogWrite(MOTOR2_IN4, LOW);
 }
 
 void blinkLed() {
